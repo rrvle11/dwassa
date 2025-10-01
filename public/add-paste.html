@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Paste - Chakerbakerben</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-paste">Add Paste</a></li>
+                <li><a href="/users">Users</a></li>
+
+                <li><a href="/hall-of-autism">Hall of Autism</a></li>
+                <li><a href="/support">Support</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="user-status">
+                    <a href="/login">Login</a> | <a href="/register">Register</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>Create New Paste</h2>
+
+            <div id="message" class="message" style="display: none;"></div>
+
+            <form id="paste-form">
+                <div class="form-group">
+                    <label for="title">Paste Title:</label>
+                    <input type="text" id="title" name="title" placeholder="Enter a descriptive title..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Paste Content:</label>
+                    <textarea id="content" name="content" placeholder="Paste your code or text here..."
+                        required></textarea>
+                </div>
+
+                <button type="submit" class="form-submit">Create Paste</button>
+            </form>
+
+            <div class="form-links">
+                <p><a href="/">← Back to Home</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function checkAuth() {
+            
+            try {
+                const response = await fetch('/api/pastes');
+                const data = await response.json();
+
+                if (!data.user) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                updateUserStatus(data.user);
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        function updateUserStatus(user) {
+            const userStatus = document.getElementById('user-status');
+            if (user) {
+                let usernameHtml = '';
+                if (user.isBanned) {
+                    usernameHtml = `<span class="username banned-user">${user.username}</span> <span class="banned-rank">[BANNED]</span>`;
+                } else {
+                    usernameHtml = `<span class="username rank-${user.rank.toLowerCase()}">${user.username}</span>`;
+                }
+                
+                userStatus.innerHTML = `
+                    Logged in as: ${usernameHtml} | 
+                    <a href="/profile.html?userId=${user.id}">Profile</a> |
+                    <a href="#" onclick="logout()">Logout</a>
+                `;
+            }
+        }
+
+        async function logout() {
+            
+            try {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                });
+                location.reload();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        document.getElementById('paste-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const messageDiv = document.getElementById('message');
+
+            if (!title.trim() || !content.trim()) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Title and content are required';
+                messageDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/add-paste', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title: title.trim(), content: content.trim() })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = 'Paste created successfully! Redirecting...';
+                    messageDiv.style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = `/paste/${data.pasteId}`;
+                    }, 1000);
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = data.error || 'Failed to create paste';
+                    messageDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Create paste error:', error);
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Network error. Please try again.';
+                messageDiv.style.display = 'block';
+            }
+        });
+
+        checkAuth();
+    </script>
+</body>
+
+</html>

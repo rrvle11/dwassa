@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paste View - Chakerbakerben</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-paste">Add Paste</a></li>
+                <li><a href="/users">Users</a></li>
+
+                <li><a href="/hall-of-autism">Hall of Autism</a></li>
+                <li><a href="/support">Support</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="user-status">
+                    <a href="/login">Login</a> | <a href="/register">Register</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="loading" class="loading">Loading paste...</div>
+
+        <div id="paste-container" class="paste-container" style="display: none;">
+            <div class="paste-content">
+                <pre id="paste-content-text"></pre>
+            </div>
+
+            <div class="paste-sidebar">
+                <div class="paste-meta">
+                    <h3 id="paste-title"></h3>
+                    <p><strong>Author:</strong> <span id="paste-author"></span></p>
+                    <p><strong>Created:</strong> <span id="paste-date"></span></p>
+                    <p><strong>Views:</strong> <span id="paste-views"></span></p>
+                    <p><strong>Likes:</strong> <span id="paste-likes"></span></p>
+                    <p><strong>Dislikes:</strong> <span id="paste-dislikes"></span></p>
+                </div>
+
+                <div class="paste-actions">
+                    <button onclick="viewRaw()">Raw (R)</button>
+                    <button onclick="window.location.href='/add-paste'">New (N)</button>
+                    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+                    <button id="admin-delete-btn" onclick="deletePaste()" style="display: none; background-color: #dc3545; color: white; border: 1px solid #dc3545;">Delete Paste (Admin)</button>
+                </div>
+
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+                    <p style="color: #888; font-size: 12px;">
+                        Comments are disabled.<br><br>
+                        Please note that all posted information is publicly available and must follow our TOS.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-message" class="message error" style="display: none;">
+            Paste not found or error loading paste.
+        </div>
+    </div>
+
+
+
+    <script>
+        let currentPaste = null;
+
+        // Function to convert URLs in text to clickable links
+        function makeLinksClickable(text) {
+            if (!text) return text;
+            
+            // Regular expression to match URLs
+            const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi;
+            
+            // Replace URLs with clickable links
+            return text.replace(urlRegex, function(url) {
+                // Clean up the URL (remove trailing punctuation that might not be part of the URL)
+                const cleanUrl = url.replace(/[.,;:!?]+$/, '');
+                const trailingPunctuation = url.substring(cleanUrl.length);
+                
+                return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="auto-link">${cleanUrl}</a>${trailingPunctuation}`;
+            });
+        }
+
+        async function loadPaste() {
+            try {
+                
+                const pasteId = window.location.pathname.split('/').pop();
+                const response = await fetch(`/api/paste/${pasteId}`);
+
+                if (!response.ok) {
+                    throw new Error('Paste not found');
+                }
+
+                const data = await response.json();
+                displayPaste(data.paste, data.authorBanInfo);
+                updateUserStatus(data.user);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('paste-container').style.display = 'flex';
+            } catch (error) {
+                console.error('Error loading paste:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        }
+
+        function displayPaste(paste, authorBanInfo) {
+            currentPaste = paste;
+
+            // Debug logging
+            console.log('Displaying paste:', paste);
+            console.log('Paste content length:', paste.content ? paste.content.length : 'No content');
+
+            document.getElementById('paste-title').textContent = paste.title || 'Untitled';
+            
+            // Ensure content is displayed properly with clickable links
+            const contentElement = document.getElementById('paste-content-text');
+            const pasteContent = paste.content || 'No content available';
+            
+            // Add a fallback if content is empty
+            if (!paste.content || paste.content.trim() === '') {
+                contentElement.textContent = 'This paste appears to be empty.';
+                contentElement.style.fontStyle = 'italic';
+                contentElement.style.color = '#888';
+            } else {
+                // Apply link detection to paste content
+                contentElement.innerHTML = makeLinksClickable(pasteContent);
+                contentElement.style.fontStyle = 'normal';
+                contentElement.style.color = '#e0e0e0';
+            }
+
+            // Display author with ban styling if banned
+            const authorName = paste.author || 'Unknown';
+            let authorHtml = '';
+            
+            if (authorBanInfo && authorBanInfo.isBanned) {
+                authorHtml = `<span class="banned-user">${authorName}</span> <span class="banned-rank">[BANNED]</span>`;
+            } else {
+                const authorRank = paste.authorRank || 'member';
+                authorHtml = `<span class="rank-${authorRank.toLowerCase()}">${authorName}</span>`;
+            }
+            
+            document.getElementById('paste-author').innerHTML = authorHtml;
+            
+            document.getElementById('paste-date').textContent = new Date(paste.createdAt).toLocaleString();
+            document.getElementById('paste-views').textContent = paste.views || 0;
+            document.getElementById('paste-likes').textContent = paste.likes || 0;
+            document.getElementById('paste-dislikes').textContent = paste.dislikes || 0;
+
+            document.title = `${paste.title || 'Paste'} - Chakerbakerben`;
+        }
+
+        function updateUserStatus(user) {
+            const userStatus = document.getElementById('user-status');
+            if (user) {
+                let usernameHtml = '';
+                if (user.isBanned) {
+                    usernameHtml = `<span class="username banned-user">${user.username}</span> <span class="banned-rank">[BANNED]</span>`;
+                } else {
+                    usernameHtml = `<span class="username rank-${user.rank.toLowerCase()}">${user.username}</span>`;
+                }
+                
+                userStatus.innerHTML = `
+                    Logged in as: ${usernameHtml} | 
+                    <a href="/profile.html?userId=${user.id}">Profile</a> |
+                    <a href="#" onclick="logout()">Logout</a>
+                `;
+                // Check if user is admin and show delete button
+                checkAdminStatus();
+            } else {
+                userStatus.innerHTML = '<a href="/login">Login</a> | <a href="/register">Register</a>';
+            }
+        }
+
+        async function checkAdminStatus() {
+            const deleteBtn = document.getElementById('admin-delete-btn');
+            
+            try {
+                // First admin check
+                const response1 = await fetch('/api/admin/check', {
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (!response1.ok) {
+                    deleteBtn.style.display = 'none';
+                    deleteBtn.removeAttribute('data-admin-verified');
+                    return;
+                }
+                
+                const data1 = await response1.json();
+                
+                // Second admin check for double verification
+                const response2 = await fetch('/api/admin/check', {
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (!response2.ok) {
+                    deleteBtn.style.display = 'none';
+                    deleteBtn.removeAttribute('data-admin-verified');
+                    return;
+                }
+                
+                const data2 = await response2.json();
+                
+                // Both checks must confirm admin status
+                if (data1.isAdmin && data1.rank === 'Admin' && 
+                    data2.isAdmin && data2.rank === 'Admin') {
+                    deleteBtn.style.display = 'inline-block';
+                    deleteBtn.setAttribute('data-admin-verified', 'true');
+                    deleteBtn.setAttribute('data-verified-at', Date.now());
+                } else {
+                    deleteBtn.style.display = 'none';
+                    deleteBtn.removeAttribute('data-admin-verified');
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                // Hide button on any error for security
+                deleteBtn.style.display = 'none';
+                deleteBtn.removeAttribute('data-admin-verified');
+            }
+        }
+
+        async function deletePaste() {
+            // Security check 1: Verify paste is loaded
+            if (!currentPaste) {
+                alert('No paste loaded to delete.');
+                return;
+            }
+            
+            // Security check 2: Verify admin button is properly verified
+            const deleteBtn = document.getElementById('admin-delete-btn');
+            
+            if (!deleteBtn.getAttribute('data-admin-verified')) {
+                alert('Admin verification required. Please refresh the page and try again.');
+                return;
+            }
+            
+            // Security check 3: Re-verify admin status before deletion
+            try {
+                const adminCheck = await fetch('/api/admin/check', {
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (!adminCheck.ok) {
+                    alert('Admin verification failed. Please log in again.');
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                const adminData = await adminCheck.json();
+                if (!adminData.isAdmin || adminData.rank !== 'Admin') {
+                    alert('Admin privileges required. Access denied.');
+                    deleteBtn.style.display = 'none';
+                    return;
+                }
+            } catch (error) {
+                console.error('Error verifying admin status:', error);
+                alert('Unable to verify admin status. Please try again.');
+                return;
+            }
+            
+            // Perform immediate deletion
+            await performDelete();
+        }
+        
+
+        
+        async function performDelete() {
+            const deleteBtn = document.getElementById('admin-delete-btn');
+            const originalText = deleteBtn.textContent;
+            
+            // Show loading state
+            deleteBtn.textContent = 'Deleting...';
+            deleteBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`/api/admin/paste/${currentPaste._id}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Action': 'delete-paste',
+                        'X-Paste-Title': currentPaste.title
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`✅ Paste deleted successfully!\n\nDeleted: "${result.deletedPaste?.title || currentPaste.title}"\nBy: ${result.deletedPaste?.author || currentPaste.author}\n\nRedirecting to homepage...`);
+                    
+                    // Clear the current paste data
+                    currentPaste = null;
+                    
+                    // Redirect to homepage
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    const error = await response.json();
+                    let errorMessage = 'Unknown error';
+                    
+                    if (response.status === 403) {
+                        errorMessage = 'Access denied. Admin privileges may have been revoked.';
+                    } else if (response.status === 404) {
+                        errorMessage = 'Paste not found. It may have already been deleted.';
+                    } else if (response.status === 429) {
+                        errorMessage = 'Too many admin operations. Please wait before trying again.';
+                    } else {
+                        errorMessage = error.error || 'Server error occurred.';
+                    }
+                    
+                    alert(`❌ Error deleting paste: ${errorMessage}`);
+                    
+                    // Reset button state
+                    deleteBtn.textContent = originalText;
+                    deleteBtn.disabled = false;
+                    
+                    // If access denied, hide the button and suggest re-login
+                    if (response.status === 403) {
+                        deleteBtn.style.display = 'none';
+                        deleteBtn.removeAttribute('data-admin-verified');
+                        alert('Please log in again to verify your admin status.');
+                    }
+                }
+            } catch (error) {
+                console.error('Error deleting paste:', error);
+                alert('❌ Network error occurred while deleting paste. Please check your connection and try again.');
+                
+                // Reset button state
+                deleteBtn.textContent = originalText;
+                deleteBtn.disabled = false;
+            }
+        }
+
+        function viewRaw() {
+            if (!currentPaste) {
+                console.error('No currentPaste available');
+                alert('No paste data available. Please refresh the page.');
+                return;
+            }
+
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+                <html>
+                <head>
+                    <title>Raw - ${currentPaste.title}</title>
+                    <style>
+                        body { 
+                            background: #000; 
+                            color: #fff; 
+                            font-family: 'Courier New', monospace; 
+                            margin: 20px;
+                        }
+                        pre { 
+                            white-space: pre-wrap; 
+                            word-wrap: break-word; 
+                        }
+                    </style>
+                </head>
+                <body>
+                    <pre>${currentPaste.content}</pre>
+                </body>
+                </html>
+            `);
+        }
+
+        async function copyToClipboard() {
+            if (!currentPaste) {
+                console.error('No currentPaste available for clipboard');
+                alert('No paste data available. Please refresh the page.');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(currentPaste.content);
+                alert('Paste content copied to clipboard!');
+            } catch (err) {
+                const textArea = document.createElement('textarea');
+                textArea.value = currentPaste.content;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Paste content copied to clipboard!');
+            }
+        }
+
+        async function logout() {
+            try {
+                
+                await fetch('/api/logout', {
+                    method: 'POST',
+                });
+                location.reload();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+
+
+        loadPaste();
+    </script>
+</body>
+
+</html>

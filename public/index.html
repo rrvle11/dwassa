@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <title>Chakerbakerben - Share your code and text securely!</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-paste">Add Paste</a></li>
+                <li><a href="/users">Users</a></li>
+
+                <li><a href="/hall-of-autism">Hall of Autism</a></li>
+                <li><a href="/support">Support</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="user-status">
+                    <a href="/login">Login</a> | <a href="/register">Register</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="ascii-banner">
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣴⣶⣿⠿⠛⠛⠛⠻⠿⣿⣿⣿⣿⣿⣶⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣿⣿⣿⣷⣻⠶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⠂⠀⢀⣠⣾⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⣿⣿⡿⣽⣻⣳⢎⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⢡⠂⠄⣢⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣟⡷⣯⡞⣝⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠀⠁⡐⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣳⣟⡾⣹⢎⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠂⣼⣿⣿⣿⣿⡿⠿⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠛⠻⠿⣿⣿⣿⣿⣿⡿⣾⣝⣧⢻⡜⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢂⠐⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠂⢸⣿⡿⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠻⠿⣿⣳⢯⣞⡳⣎⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⢈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⠁⠚⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠛⢯⡞⣵⣋⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠱⣍⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⢀⣾⡇⠀⣾⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⠁⣾⣿⡇⢰⣿⣿⠀⠀⣆⠀⠀⠀⠀⢰⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⣼⡏⢰⣿⣿⠇⣾⣿⣿⡆⠀⣿⠀⠀⠀⠀⢸⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡇⠀⠀⠀⠀⠀⠀⠀⠀⠰⠃⠀⠒⠛⠃⠚⠿⣿⢰⣿⣿⣿⡇⣤⣿⣤⣶⣦⣀⢼⣿⣧⠀⢰⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⢠⣶⢰⣿⣿⣿⣧⡹⢓⣾⣾⣿⣿⣿⣧⣿⣿⣿⣿⣋⣁⣀⣀⣀⣁⠘⠃⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣾⡟⢋⠁⡀⠀⠉⠙⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠱⣚⣭⡿⢿⣿⣷⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⢠⣆⠀⠀⠀⠀⣿⣏⡀⣾⠀⠀⠀⠀⣰⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⣁⠀⢠⠀⠀⠉⠻⢿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⢇⣾⣿⣷⠀⠀⠀⣿⣿⣿⣞⡓⠥⠬⣒⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⠀⠀⠀⠀⠀⣦⠈⢳⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣾⣿⣿⣿⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣮⡢⢄⡀⠤⠾⢧⣦⣼⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⡇⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⢁⣿⣿⠇⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣏⢾⡅⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠆⣼⣿⣿⣦⣾⠀⠀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⠀⠀⠀⠀⢀⠰⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣻⢿⣯⡿⣟⠇⠀⡜⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⠌⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⢧⡟⡿⣾⡽⢏⣿⣾⣿⡌⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣛⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⢀⡰⣣⢻⡜⣯⢳⡝⣼⣿⣿⣿⣿⣆⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⢂⠐⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⢠⠎⡵⢣⢧⡹⣜⢣⣿⣿⣿⣿⣿⣿⣿⣷⡌⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⢀⠂⠔⡀⢂⠐⡀⢂⠠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠡⢚⠴⣉⠦⡑⢎⢣⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣙⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⡩⠂⠀⠀⠀⠀⠀⣀⡔⢦⠃⢈⠐⡀⢂⠐⠠⠀⠄⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠁⠎⡰⢡⠙⡌⣸⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠟⠒⠌⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⠉⠀⠈⠀⠀⠀⠀⠀⣀⠶⡱⢎⢧⢋⠀⡐⢀⠂⠌⢀⠂⢀⠂⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠢⠑⡨⣟⠿⠟⠟⠋⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠟⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢴⡩⢞⡱⢫⠜⡪⢅⠀⠂⠄⠂⠠⠀⠂⢀⠐⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢢⡙⢦⡙⡔⢣⠈⢀⠂⠈⡀⠐⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠂⠴⢉⠆⡁⠀⡀⠁⢀⠐⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠐⠡⠀⠀⠐⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠂⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        </div>
+
+        <div class="welcome">
+            Welcome to the Chakerbakerben!<br>Jazirat Chakerbakrben fin djaj wla flaless.
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search pastes by title, content, or author...">
+            <button onclick="searchPastes()">Search</button>
+        </div>
+
+        <div class="section-header">Recent Pastes</div>
+
+        <div id="loading" class="loading">Loading pastes...</div>
+
+        <table id="pastes-table" class="pastes-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Comments</th>
+                    <th>Views</th>
+                    <th>Created by</th>
+                    <th>Added</th>
+                </tr>
+            </thead>
+            <tbody id="pastes-tbody">
+            </tbody>
+        </table>
+
+        <div id="pagination" class="pagination"></div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentSearch = '';
+
+        // Add glitter effect to admin ranks
+        function addGlitterToAdminRanks() {
+            const adminElements = document.querySelectorAll('.rank-admin, .profile-rank.admin-rank');
+            
+            adminElements.forEach(element => {
+                // Remove existing glitter if any
+                const existingGlitter = element.querySelector('.glitter');
+                if (existingGlitter) {
+                    existingGlitter.remove();
+                }
+                
+                // Create glitter container
+                const glitter = document.createElement('div');
+                glitter.className = 'glitter';
+                
+                // Generate 50 random sparkles
+                for (let i = 0; i < 50; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = (Math.random() * 1) + 's';
+                    sparkle.style.animationDuration = (0.6 + Math.random() * 0.8) + 's';
+                    glitter.appendChild(sparkle);
+                }
+                
+                element.appendChild(glitter);
+            });
+        }
+
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) {
+                return '';
+            }
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function sanitizeCssClass(className) {
+            if (!className) return '';
+            return String(className).replace(/[^a-zA-Z0-9_-]/g, '');
+        }
+
+        async function loadPastes(page = 1, search = '') {
+            try {
+                
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('pastes-table').style.display = 'none';
+
+                const response = await fetch(`/api/pastes?page=${page}&search=${encodeURIComponent(search)}`);
+                const data = await response.json();
+
+                displayPastes(data.pastes);
+                displayPagination(data.currentPage, data.totalPages);
+                updateUserStatus(data.user);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('pastes-table').style.display = 'table';
+                
+                // Add glitter to admin ranks after display
+                setTimeout(addGlitterToAdminRanks, 100);
+            } catch (error) {
+                console.error('Error loading pastes:', error);
+                const loadingElement = document.getElementById('loading');
+                loadingElement.textContent = 'Error loading pastes';
+            }
+        }
+
+        function displayPastes(pastes) {
+            const tbody = document.getElementById('pastes-tbody');
+            tbody.innerHTML = '';
+
+            pastes.forEach(paste => {
+                const row = document.createElement('tr');
+
+                const title = paste.title || '';
+                const truncatedTitle = title.length > 50 ? title.substring(0, 50) + '...' : title;
+                const author = paste.author || 'Anonymous';
+                const comments = parseInt(paste.comments) || 0;
+                const views = parseInt(paste.views) || 0;
+                const formattedDate = new Date(paste.createdAt).toLocaleDateString();
+
+                const titleCell = document.createElement('td');
+                const titleLink = document.createElement('a');
+                titleLink.href = `/paste/${encodeURIComponent(paste._id || '')}`;
+                titleLink.textContent = truncatedTitle;
+                titleCell.appendChild(titleLink);
+
+                const commentsCell = document.createElement('td');
+                commentsCell.textContent = comments;
+
+                const viewsCell = document.createElement('td');
+                viewsCell.textContent = views;
+
+                const authorCell = document.createElement('td');
+                const authorSpan = document.createElement('span');
+                authorSpan.className = `rank-${sanitizeCssClass(author.toLowerCase())}`;
+                authorSpan.textContent = author;
+                authorCell.appendChild(authorSpan);
+
+                const dateCell = document.createElement('td');
+                dateCell.textContent = formattedDate;
+
+                row.appendChild(titleCell);
+                row.appendChild(commentsCell);
+                row.appendChild(viewsCell);
+                row.appendChild(authorCell);
+                row.appendChild(dateCell);
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function displayPagination(currentPage, totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            if (currentPage > 1) {
+                const prevLink = document.createElement('a');
+                prevLink.href = '#';
+                prevLink.textContent = '« Previous';
+                prevLink.onclick = (e) => {
+                    e.preventDefault();
+                    loadPastes(currentPage - 1, currentSearch);
+                };
+                pagination.appendChild(prevLink);
+            }
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    const current = document.createElement('span');
+                    current.textContent = i;
+                    current.className = 'current';
+                    pagination.appendChild(current);
+                } else {
+                    const pageLink = document.createElement('a');
+                    pageLink.href = '#';
+                    pageLink.textContent = i;
+                    pageLink.onclick = (e) => {
+                        e.preventDefault();
+                        loadPastes(i, currentSearch);
+                    };
+                    pagination.appendChild(pageLink);
+                }
+            }
+
+            if (currentPage < totalPages) {
+                const nextLink = document.createElement('a');
+                nextLink.href = '#';
+                nextLink.textContent = 'Next »';
+                nextLink.onclick = (e) => {
+                    e.preventDefault();
+                    loadPastes(currentPage + 1, currentSearch);
+                };
+                pagination.appendChild(nextLink);
+            }
+        }
+
+        function updateUserStatus(user) {
+            const userStatus = document.getElementById('user-status');
+
+            userStatus.innerHTML = '';
+
+            if (user) {
+                const loggedInText = document.createTextNode('Logged in as: ');
+                userStatus.appendChild(loggedInText);
+
+                if (user.isBanned) {
+                    const usernameSpan = document.createElement('span');
+                    usernameSpan.className = 'username banned-user';
+                    usernameSpan.textContent = user.username || 'Unknown';
+                    userStatus.appendChild(usernameSpan);
+                    
+                    const separator = document.createTextNode(' ');
+                    userStatus.appendChild(separator);
+                    
+                    const bannedSpan = document.createElement('span');
+                    bannedSpan.className = 'banned-rank';
+                    bannedSpan.textContent = '[BANNED]';
+                    userStatus.appendChild(bannedSpan);
+                } else {
+                    const usernameSpan = document.createElement('span');
+                    usernameSpan.className = `username rank-${sanitizeCssClass((user.rank || '').toLowerCase())}`;
+                    usernameSpan.textContent = user.username || 'Unknown';
+                    userStatus.appendChild(usernameSpan);
+                }
+
+                const separator1 = document.createTextNode(' | ');
+                userStatus.appendChild(separator1);
+
+                const profileLink = document.createElement('a');
+                profileLink.href = `/profile.html?userId=${user.id}`;
+                profileLink.textContent = 'Profile';
+                userStatus.appendChild(profileLink);
+
+                const separator2 = document.createTextNode(' | ');
+                userStatus.appendChild(separator2);
+
+                const logoutLink = document.createElement('a');
+                logoutLink.href = '#';
+                logoutLink.textContent = 'Logout';
+                logoutLink.onclick = function (e) {
+                    e.preventDefault();
+                    logout();
+                };
+                userStatus.appendChild(logoutLink);
+                
+                // Add glitter to navigation admin rank
+                setTimeout(addGlitterToAdminRanks, 50);
+            } else {
+                const loginLink = document.createElement('a');
+                loginLink.href = '/login';
+                loginLink.textContent = 'Login';
+                userStatus.appendChild(loginLink);
+
+                const separator = document.createTextNode(' | ');
+                userStatus.appendChild(separator);
+
+                const registerLink = document.createElement('a');
+                registerLink.href = '/register';
+                registerLink.textContent = 'Register';
+                userStatus.appendChild(registerLink);
+            }
+        }
+
+        function searchPastes() {
+            const searchInput = document.getElementById('search-input');
+            let searchValue = searchInput.value || '';
+
+            searchValue = searchValue.trim();
+            if (searchValue.length > 100) {
+                searchValue = searchValue.substring(0, 100);
+                searchInput.value = searchValue;
+            }
+
+            currentSearch = searchValue;
+            currentPage = 1;
+            loadPastes(1, currentSearch);
+        }
+
+        async function logout() {
+            
+            try {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                });
+                location.reload();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchPastes();
+            }
+        });
+
+        loadPastes();
+    </script>
+</body>
+
+</html>

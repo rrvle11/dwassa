@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2025-09-29T22:10:07.960Z",
+    "userId": "68d8844407ebc91024cc2ca0",
+    "username": "testuser",
+    "ipAddress": "::1",
+    "action": "LOGIN_SUCCESS"
+  },
+  {
+    "timestamp": "2025-09-29T22:10:07.962Z",
+    "userId": "68d8844407ebc91024cc2ca0",
+    "username": "testuser",
+    "ipAddress": "::1",
+    "action": "login"
+  },
+  {
+    "timestamp": "2025-09-29T22:11:23.614Z",
+    "userId": "68d8844407ebc91024cc2ca0",
+    "username": "testuser",
+    "ipAddress": "::1",
+    "action": "LOGIN_SUCCESS"
+  },
+  {
+    "timestamp": "2025-09-29T22:11:23.616Z",
+    "userId": "68d8844407ebc91024cc2ca0",
+    "username": "testuser",
+    "ipAddress": "::1",
+    "action": "login"
+  }
+]

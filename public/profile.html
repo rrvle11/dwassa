@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Chakerbakerben</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-paste">Add Paste</a></li>
+                <li><a href="/users">Users</a></li>
+
+                <li><a href="/hall-of-autism">Hall of Autism</a></li>
+                <li><a href="/support">Support</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="user-status">
+                    <a href="/login">Login</a> | <a href="/register">Register</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="loading" class="loading">Loading profile...</div>
+        <div id="error-message" class="message error" style="display: none;"></div>
+
+        <div id="profile-container" class="profile-container" style="display: none;">
+            <div class="profile-header">
+                <div class="profile-banner-container">
+                    <img id="profile-banner" class="profile-banner" alt="Profile Banner" style="display: none;">
+                    <div id="default-banner" class="default-banner"></div>
+                </div>
+                <div class="profile-picture-container">
+                    <img id="profile-picture" class="profile-picture" alt="Profile Picture" style="display: none;">
+                    <div id="default-avatar" class="default-avatar" style="display: none;">?</div>
+                </div>
+                <div class="profile-info">
+                    <h1 id="profile-username" class="profile-username">Username <span id="profile-rank" class="profile-rank"></span></h1>
+                    <div class="profile-details">
+                        <span id="profile-bio" class="profile-bio">No bio available</span>
+                        <div class="profile-stats-inline">
+                            <span class="stat-item"><span id="profile-following">0</span> Following</span>
+                            <span class="stat-item"><span id="profile-followers">1</span> Followers</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="profile-song-container" class="profile-song-container" style="display: none;">
+                    <iframe id="profile-song-player" class="profile-song-player" 
+                            width="300" height="169" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="profile-actions">
+                    <button id="edit-profile-btn" class="edit-profile-btn" onclick="editProfile()" style="display: none;">Edit Profile</button>
+                    <div id="admin-rank-controls" class="admin-rank-controls" style="display: none;">
+                        <label for="rank-select">Change Rank:</label>
+                        <select id="rank-select" class="rank-select">
+                            <option value="Member">Member</option>
+                            <option value="VIP">VIP</option>
+                            <option value="Moderator">Moderator</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Criminal">Criminal</option>
+                            <option value="Rich">Rich</option>
+                        </select>
+                        <button id="change-rank-btn" class="change-rank-btn" onclick="changeUserRank()">Change Rank</button>
+                        <button id="admin-panel-btn" class="admin-panel-btn" onclick="openAdminPanel()">View User Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <div class="info-section">
+                        <h3>Info</h3>
+                        <div class="info-item">
+                            <span class="info-label">UID</span>
+                            <span class="info-value" id="profile-uid">556174</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Pastes</span>
+                            <span class="info-value" id="profile-pastes-count">2</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Likes</span>
+                            <span class="info-value" id="profile-likes-count">4</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Created:</span>
+                            <span class="info-value" id="profile-join-date">May 18, 2025</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-main">
+                    <div class="pastes-section">
+                        <h3>Pastes</h3>
+                        <div id="user-pastes-container">
+                            <div id="pastes-loading" class="loading">Loading pastes...</div>
+                            <div id="no-pastes" style="display: none;">
+                                <p>No pastes found.</p>
+                            </div>
+                            <div id="pastes-list" style="display: none;">
+                                <table class="pastes-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Comments</th>
+                                            <th>Views</th>
+                                            <th>Added</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pastes-tbody">
+                                    </tbody>
+                                </table>
+                                <div class="pagination-info">
+                                    <span id="pagination-text">Showing 2 out of 2 pastes</span>
+                                </div>
+                                <div id="pastes-pagination" class="pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-profile-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="profile-picture-input">Profile Picture:</label>
+                        <input type="file" id="profile-picture-input" name="profilePicture" accept="image/*">
+                        <small class="form-help">Max size: 5MB (3MB for animated GIFs). Supported formats: JPG, PNG, GIF, WebP</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="banner-input">Profile Banner:</label>
+                        <input type="file" id="banner-input" name="banner" accept="image/*">
+                        <small class="form-help">Max size: 8MB (5MB for animated GIFs). Recommended: 1200x300px. Supported formats: JPG, PNG, GIF, WebP</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="bio-input">Bio:</label>
+                        <textarea id="bio-input" name="bio" maxlength="50" rows="2" placeholder="Tell us about yourself..."></textarea>
+                        <small class="form-help"><span id="bio-char-count">0</span>/50 characters</small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" onclick="closeEditModal()" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let profileUser = null;
+        let isOwnProfile = false;
+        let currentPastesPage = 1;
+
+        // Function to convert URLs in text to clickable links
+        function makeLinksClickable(text) {
+            if (!text) return text;
+            
+            // Regular expression to match URLs
+            const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi;
+            
+            // Replace URLs with clickable links
+            return text.replace(urlRegex, function(url) {
+                // Clean up the URL (remove trailing punctuation that might not be part of the URL)
+                const cleanUrl = url.replace(/[.,;:!?]+$/, '');
+                const trailingPunctuation = url.substring(cleanUrl.length);
+                
+                return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="auto-link">${cleanUrl}</a>${trailingPunctuation}`;
+            });
+        }
+
+        // Add glitter effect to admin ranks
+        function addGlitterToAdminRanks() {
+            const adminElements = document.querySelectorAll('.rank-admin, .profile-rank.admin-rank');
+            
+            adminElements.forEach(element => {
+                // Remove existing glitter if any
+                const existingGlitter = element.querySelector('.glitter');
+                if (existingGlitter) {
+                    existingGlitter.remove();
+                }
+                
+                // Create glitter container
+                const glitter = document.createElement('div');
+                glitter.className = 'glitter';
+                
+                // Generate 50 random sparkles
+                for (let i = 0; i < 50; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = (Math.random() * 1) + 's';
+                    sparkle.style.animationDuration = (0.6 + Math.random() * 0.8) + 's';
+                    glitter.appendChild(sparkle);
+                }
+                
+                element.appendChild(glitter);
+            });
+        }
+
+        async function loadProfile() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const userId = urlParams.get('userId');
+                
+                if (!userId) {
+                    // If no ID provided, redirect to current user's profile
+                    const userResponse = await fetch('/api/user');
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json();
+                        if (userData.user) {
+                            window.location.href = `/profile.html?userId=${userData.user.id}`;
+                            return;
+                        }
+                    }
+                    throw new Error('No user ID provided and not logged in');
+                }
+
+                // Load profile data
+                const response = await fetch(`/api/profile/${userId}`);
+                if (!response.ok) {
+                    throw new Error('Profile not found');
+                }
+
+                const data = await response.json();
+                profileUser = data.profile;
+                currentUser = data.currentUser;
+                isOwnProfile = data.isOwnProfile;
+
+                displayProfile();
+                loadUserPastes();
+                updateUserStatus();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('profile-container').style.display = 'block';
+                
+                // Add glitter to admin ranks after display
+                setTimeout(addGlitterToAdminRanks, 100);
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                document.getElementById('loading').style.display = 'none';
+                
+                let errorMessage = 'An error occurred while loading the profile.';
+                let showLoginButton = false;
+                
+                if (error.message.includes('No user ID provided and not logged in')) {
+                    errorMessage = 'You need to be logged in to view profiles.';
+                    showLoginButton = true;
+                } else if (error.message.includes('Profile not found')) {
+                    errorMessage = 'The requested profile could not be found.';
+                } else if (error.message.includes('Not authenticated')) {
+                    errorMessage = 'Please log in to continue.';
+                    showLoginButton = true;
+                }
+                
+                document.getElementById('profile-container').innerHTML = `
+                    <div class="error-message">
+                        <h2>Profile Not Available</h2>
+                        <p>${errorMessage}</p>
+                        ${showLoginButton ? '<a href="/login" class="btn">Login</a>' : '<a href="/" class="btn">Go Home</a>'}
+                    </div>
+                `;
+            }
+        }
+
+        function displayProfile() {
+            // Basic profile info
+            const userRank = profileUser.rank || 'Member';
+            const isBanned = profileUser.isBanned;
+            
+            let usernameClass = '';
+            let rankDisplay = '';
+            let rankClass = '';
+            
+            if (isBanned) {
+                usernameClass = 'banned-user';
+                rankDisplay = '[BANNED]';
+                rankClass = 'banned-rank';
+            } else {
+                rankClass = `profile-rank rank-${userRank.toLowerCase()}`;
+                const adminRankClass = userRank.toLowerCase() === 'admin' ? ' admin-rank' : '';
+                rankClass += adminRankClass;
+                rankDisplay = `[${userRank}]`;
+            }
+            
+            document.getElementById('profile-username').innerHTML = `<span class="${usernameClass}">${profileUser.username}</span> <span id="profile-rank" class="${rankClass}">${rankDisplay}</span>`;
+            
+            // Bio with clickable links
+            const bioText = profileUser.bio || 'No bio available';
+            document.getElementById('profile-bio').innerHTML = makeLinksClickable(bioText);
+            
+            // Banner
+            const profileBanner = document.getElementById('profile-banner');
+            const defaultBanner = document.getElementById('default-banner');
+            
+            if (profileUser.banner) {
+                profileBanner.src = profileUser.banner;
+                profileBanner.style.display = 'block';
+                defaultBanner.style.display = 'none';
+            } else {
+                profileBanner.style.display = 'none';
+                defaultBanner.style.display = 'block';
+            }
+            
+            // Profile picture
+            const profilePicture = document.getElementById('profile-picture');
+            const defaultAvatar = document.getElementById('default-avatar');
+            
+            if (profileUser.profilePicture) {
+                profilePicture.src = profileUser.profilePicture;
+                profilePicture.style.display = 'block';
+                defaultAvatar.style.display = 'none';
+            } else {
+                profilePicture.style.display = 'none';
+                defaultAvatar.style.display = 'flex';
+                defaultAvatar.textContent = profileUser.username.charAt(0).toUpperCase();
+            }
+
+            // Profile song
+            const profileSongContainer = document.getElementById('profile-song-container');
+            const profileSongPlayer = document.getElementById('profile-song-player');
+            
+            console.log('Profile user data:', profileUser);
+            console.log('Profile song value:', profileUser.profileSong);
+            console.log('Username check:', profileUser.username.toLowerCase());
+            console.log('User ID check:', profileUser._id);
+            
+            // Special handling for admin user - auto-play local MP3
+            // Check both username and specific user ID as fallback
+            if (profileUser.username.toLowerCase() === 'admin' || profileUser._id === '68d86068e5b274512eaec8c1') {
+                console.log('Admin user detected - playing local MP3');
+                
+                // Clear existing content and create audio element
+                profileSongContainer.innerHTML = `
+                    <audio id="admin-song-player" class="admin-song-player" 
+                           controls autoplay loop 
+                           style="width: 300px; background: rgba(0, 0, 0, 0.8); border-radius: 8px;">
+                        <source src="/assets/sim-swap-128-ytshorts.savetube.me.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                `;
+                profileSongContainer.style.display = 'block';
+                console.log('Admin song player created and displayed');
+                
+                // Attempt to play the audio (browsers may block autoplay)
+                setTimeout(() => {
+                    const audioPlayer = document.getElementById('admin-song-player');
+                    if (audioPlayer) {
+                        audioPlayer.play().catch(error => {
+                            console.log('Autoplay blocked by browser:', error);
+                        });
+                    }
+                }, 100);
+                
+            } else if (profileUser.profileSong) {
+                // Convert YouTube URL to embed URL with autoplay for other users
+                const youtubeUrl = profileUser.profileSong;
+                let embedUrl = '';
+                let videoId = '';
+                
+                console.log('Processing YouTube URL:', youtubeUrl);
+                
+                // Handle different YouTube URL formats with improved parsing
+                if (youtubeUrl.includes('youtu.be/')) {
+                    console.log('Detected youtu.be format');
+                    // Extract video ID from youtu.be URLs (handle parameters properly)
+                    const urlParts = youtubeUrl.split('youtu.be/')[1];
+                    videoId = urlParts.split('?')[0].split('&')[0];
+                    console.log('Extracted video ID:', videoId);
+                } else if (youtubeUrl.includes('youtube.com/watch')) {
+                    console.log('Detected youtube.com/watch format');
+                    // Extract video ID from watch URLs using URL parameters
+                    const urlParams = new URLSearchParams(youtubeUrl.split('?')[1]);
+                    videoId = urlParams.get('v');
+                    console.log('Extracted video ID:', videoId);
+                } else if (youtubeUrl.includes('youtube.com/embed/')) {
+                    console.log('Detected youtube.com/embed format');
+                    videoId = youtubeUrl.split('embed/')[1].split('?')[0].split('&')[0];
+                    console.log('Extracted video ID:', videoId);
+                } else {
+                    console.log('URL format not recognized');
+                }
+                
+                if (videoId) {
+                    embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}`;
+                }
+                
+                if (embedUrl) {
+                    console.log('Setting embed URL:', embedUrl);
+                    profileSongPlayer.src = embedUrl;
+                    profileSongContainer.style.display = 'block';
+                    console.log('Profile song container displayed');
+                } else {
+                    console.log('No valid embed URL generated');
+                    profileSongContainer.style.display = 'none';
+                }
+            } else {
+                console.log('No profile song found for user');
+                profileSongContainer.style.display = 'none';
+            }
+
+            // Stats in sidebar
+            document.getElementById('profile-uid').textContent = profileUser._id.slice(-6); // Last 6 chars of ID
+            document.getElementById('profile-pastes-count').textContent = profileUser.pastesCreated || 0;
+            document.getElementById('profile-likes-count').textContent = profileUser.likesReceived || 0;
+            document.getElementById('profile-join-date').textContent = new Date(profileUser.joinDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            // Following/Followers (placeholder for now)
+            document.getElementById('profile-following').textContent = profileUser.following || 0;
+            document.getElementById('profile-followers').textContent = profileUser.followers || 1;
+
+            // Show edit button if it's own profile
+            if (isOwnProfile) {
+                document.getElementById('edit-profile-btn').style.display = 'inline-block';
+            }
+            
+            // Show admin rank controls if current user is admin and viewing another user's profile
+            if (currentUser && currentUser.rank === 'Admin' && !isOwnProfile) {
+                document.getElementById('admin-rank-controls').style.display = 'block';
+                // Set current rank in dropdown
+                const rankSelect = document.getElementById('rank-select');
+                rankSelect.value = profileUser.rank || 'Member';
+            }
+            
+
+        }
+
+        async function loadUserPastes(page = 1) {
+            try {
+                document.getElementById('pastes-loading').style.display = 'block';
+                
+                const response = await fetch(`/api/user/${profileUser._id}/pastes?page=${page}`);
+                
+                const data = await response.json();
+
+                if (data.pastes && Array.isArray(data.pastes) && data.pastes.length > 0) {
+                    console.log('Found', data.pastes.length, 'pastes');
+                    displayUserPastes(data.pastes);
+                    displayPastesPagination(data.currentPage, data.totalPages);
+                    document.getElementById('pastes-list').style.display = 'block';
+                } else {
+                    console.log('No pastes found or empty array');
+                    document.getElementById('no-pastes').style.display = 'block';
+                }
+
+                document.getElementById('pastes-loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading user pastes:', error);
+                document.getElementById('pastes-loading').style.display = 'none';
+                document.getElementById('no-pastes').style.display = 'block';
+            }
+        }
+
+        function displayUserPastes(pastes) {
+            const tbody = document.getElementById('pastes-tbody');
+            tbody.innerHTML = '';
+
+            // Ensure pastes is an array
+            if (!Array.isArray(pastes)) {
+                pastes = [];
+            }
+
+            // Update pagination info
+            document.getElementById('pagination-text').textContent = `Showing ${pastes.length} out of ${pastes.length} pastes`;
+
+            pastes.forEach(paste => {
+                const row = document.createElement('tr');
+                
+                const titleCell = document.createElement('td');
+                const titleLink = document.createElement('a');
+                titleLink.href = `/paste/${paste._id}`;
+                titleLink.textContent = paste.title.length > 40 ? paste.title.substring(0, 40) + '...' : paste.title;
+                titleCell.appendChild(titleLink);
+
+                const commentsCell = document.createElement('td');
+                commentsCell.textContent = paste.comments || 0;
+
+                const viewsCell = document.createElement('td');
+                viewsCell.textContent = paste.views || 0;
+
+                const dateCell = document.createElement('td');
+                const date = new Date(paste.createdAt);
+                dateCell.textContent = date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                row.appendChild(titleCell);
+                row.appendChild(commentsCell);
+                row.appendChild(viewsCell);
+                row.appendChild(dateCell);
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function displayPastesPagination(currentPage, totalPages) {
+            const pagination = document.getElementById('pastes-pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.className = i === currentPage ? 'active' : '';
+                pageBtn.onclick = () => loadUserPastes(i);
+                pagination.appendChild(pageBtn);
+            }
+        }
+
+        function editProfile() {
+            if (!isOwnProfile) {
+                alert('You can only edit your own profile');
+                return;
+            }
+            
+            // Populate current values
+            document.getElementById('bio-input').value = profileUser.bio || '';
+            updateCharCount();
+            
+            // Show modal
+            document.getElementById('edit-profile-modal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-profile-modal').style.display = 'none';
+            document.getElementById('edit-profile-form').reset();
+        }
+
+        function updateCharCount() {
+            const bioInput = document.getElementById('bio-input');
+            const charCount = document.getElementById('bio-char-count');
+            charCount.textContent = bioInput.value.length;
+        }
+
+        // Bio character counter
+        document.addEventListener('DOMContentLoaded', function() {
+            const bioInput = document.getElementById('bio-input');
+            if (bioInput) {
+                bioInput.addEventListener('input', updateCharCount);
+            }
+        });
+
+        // Handle form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const editForm = document.getElementById('edit-profile-form');
+            if (editForm) {
+                editForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData();
+                    const bioInput = document.getElementById('bio-input');
+                    const profilePictureInput = document.getElementById('profile-picture-input');
+                    const bannerInput = document.getElementById('banner-input');
+                    
+                    // Add bio (with XSS protection on server side)
+                    if (bioInput.value.trim()) {
+                        formData.append('bio', bioInput.value.trim());
+                    }
+                    
+                    // Add profile picture if selected
+                    if (profilePictureInput.files[0]) {
+                        const file = profilePictureInput.files[0];
+                        
+                        // Client-side validation with different limits for GIFs
+                        if (file.type === 'image/gif') {
+                            if (file.size > 3 * 1024 * 1024) { // 3MB limit for GIFs
+                                alert('Profile picture GIF file size must be less than 3MB to preserve animation');
+                                return;
+                            }
+                        } else if (file.size > 5 * 1024 * 1024) { // 5MB limit for other images
+                            alert('Profile picture file size must be less than 5MB');
+                            return;
+                        }
+                        
+                        if (!file.type.startsWith('image/')) {
+                            alert('Please select a valid image file for profile picture (JPG, PNG, GIF, WebP)');
+                            return;
+                        }
+                        
+                        formData.append('profilePicture', file);
+                    }
+                    
+                    // Add banner if selected
+                    if (bannerInput.files[0]) {
+                        const file = bannerInput.files[0];
+                        
+                        // Client-side validation with different limits for GIFs
+                        if (file.type === 'image/gif') {
+                            if (file.size > 5 * 1024 * 1024) { // 5MB limit for banner GIFs
+                                alert('Banner GIF file size must be less than 5MB to preserve animation');
+                                return;
+                            }
+                        } else if (file.size > 8 * 1024 * 1024) { // 8MB limit for other banner images
+                            alert('Banner file size must be less than 8MB');
+                            return;
+                        }
+                        
+                        if (!file.type.startsWith('image/')) {
+                            alert('Please select a valid image file for banner (JPG, PNG, GIF, WebP)');
+                            return;
+                        }
+                        
+                        formData.append('banner', file);
+                    }
+                    
+                    try {
+                        const response = await fetch('/api/profile/update', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (response.ok) {
+                            try {
+                                const result = await response.json();
+                                alert('Profile updated successfully!');
+                                closeEditModal();
+                                // Reload profile to show changes
+                                loadProfile();
+                            } catch (jsonError) {
+                                console.error('Error parsing success response:', jsonError);
+                                alert('Profile may have been updated, but there was an issue with the response. Please refresh the page.');
+                            }
+                        } else {
+                            // Try to parse error response as JSON
+                            let errorMessage = 'Unknown error occurred';
+                            try {
+                                const contentType = response.headers.get('content-type');
+                                if (contentType && contentType.includes('application/json')) {
+                                    const error = await response.json();
+                                    errorMessage = error.message || error.error || 'Unknown error';
+                                } else {
+                                    // If response is not JSON (e.g., HTML error page)
+                                    const textResponse = await response.text();
+                                    console.error('Non-JSON error response:', textResponse);
+                                    errorMessage = `Server error (${response.status}). Please try again.`;
+                                }
+                            } catch (parseError) {
+                                console.error('Error parsing error response:', parseError);
+                                errorMessage = `Server error (${response.status}). Please try again.`;
+                            }
+                            alert('Error updating profile: ' + errorMessage);
+                        }
+                    } catch (error) {
+                        console.error('Network or other error updating profile:', error);
+                        if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
+                            alert('Error updating profile: Server returned an invalid response. Please try again.');
+                        } else {
+                            alert('Error updating profile: Network error. Please check your connection and try again.');
+                        }
+                    }
+                });
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('edit-profile-modal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        });
+
+        function updateUserStatus() {
+            const userStatus = document.getElementById('user-status');
+            if (currentUser) {
+                let usernameHtml = '';
+                if (currentUser.isBanned) {
+                    usernameHtml = `<span class="username banned-user">${currentUser.username}</span> <span class="banned-rank">[BANNED]</span>`;
+                } else {
+                    usernameHtml = `<span class="username rank-${currentUser.rank.toLowerCase()}">${currentUser.username}</span>`;
+                }
+                
+                userStatus.innerHTML = `
+                    Logged in as: ${usernameHtml} | 
+                    <a href="/profile.html?userId=${currentUser.id}">Profile</a> |
+                    <a href="#" onclick="logout()">Logout</a>
+                `;
+                // Add glitter to navigation admin rank
+                setTimeout(addGlitterToAdminRanks, 50);
+            } else {
+                userStatus.innerHTML = '<a href="/login">Login</a> | <a href="/register">Register</a>';
+            }
+        }
+
+        async function changeUserRank() {
+            const rankSelect = document.getElementById('rank-select');
+            const newRank = rankSelect.value;
+            const currentRank = profileUser.rank;
+            
+            // Confirm the action
+            if (!confirm(`Are you sure you want to change ${profileUser.username}'s rank from ${currentRank} to ${newRank}?`)) {
+                return;
+            }
+            
+            // Disable the button to prevent double-clicks
+            const changeRankBtn = document.getElementById('change-rank-btn');
+            const originalText = changeRankBtn.textContent;
+            changeRankBtn.disabled = true;
+            changeRankBtn.textContent = 'Changing...';
+            
+            try {
+                const response = await fetch('/api/admin/change-rank', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: profileUser._id,
+                        newRank: newRank
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Update the profile display
+                    profileUser.rank = newRank;
+                    const rankClass = `profile-rank rank-${newRank.toLowerCase()}`;
+                    const adminRankClass = newRank.toLowerCase() === 'admin' ? ' admin-rank' : '';
+                    document.getElementById('profile-rank').className = `${rankClass}${adminRankClass}`;
+                    document.getElementById('profile-rank').textContent = `[${newRank}]`;
+                    
+                    // Show success message
+                    alert(`Successfully changed ${profileUser.username}'s rank to ${newRank}`);
+                    
+                    // Add glitter effect if new rank is admin
+                    if (newRank.toLowerCase() === 'admin') {
+                        setTimeout(addGlitterToAdminRanks, 100);
+                    }
+                } else {
+                    alert(`Error: ${data.error || 'Failed to change rank'}`);
+                    // Reset dropdown to current rank
+                    rankSelect.value = currentRank;
+                }
+            } catch (error) {
+                console.error('Error changing rank:', error);
+                alert('Network error occurred while changing rank. Please try again.');
+                // Reset dropdown to current rank
+                rankSelect.value = currentRank;
+            } finally {
+                // Re-enable the button
+                changeRankBtn.disabled = false;
+                changeRankBtn.textContent = originalText;
+            }
+        }
+
+        // Admin Panel Functions
+        async function openAdminPanel() {
+            const modal = document.getElementById('admin-panel-modal');
+            const loading = document.getElementById('admin-loading');
+            const error = document.getElementById('admin-error');
+            const details = document.getElementById('admin-details');
+            
+            // Show modal and loading state
+            modal.style.display = 'block';
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            details.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/admin/user-details/${profileUser._id}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const userDetails = data.userDetails;
+                
+                // Populate the admin panel with user details
+                document.getElementById('admin-user-id').textContent = userDetails.basicInfo.id;
+                document.getElementById('admin-username').textContent = userDetails.basicInfo.username;
+                document.getElementById('admin-email').textContent = userDetails.basicInfo.email;
+                document.getElementById('admin-rank').textContent = userDetails.basicInfo.rank;
+                document.getElementById('admin-created-at').textContent = new Date(userDetails.basicInfo.createdAt).toLocaleString();
+                document.getElementById('admin-ip-address').textContent = userDetails.securityInfo.ipAddress;
+                document.getElementById('admin-password-hash').textContent = userDetails.securityInfo.passwordHash;
+                document.getElementById('admin-bio').textContent = userDetails.profileInfo.bio;
+                document.getElementById('admin-profile-picture').textContent = userDetails.profileInfo.profilePicture;
+                document.getElementById('admin-banner').textContent = userDetails.profileInfo.profileBanner;
+                document.getElementById('admin-profile-song').textContent = userDetails.profileInfo.profileSong;
+                
+                // Handle ban status
+                const isBanned = userDetails.basicInfo.isBanned;
+                document.getElementById('admin-is-banned').textContent = isBanned ? 'Yes' : 'No';
+                document.getElementById('admin-is-banned').style.color = isBanned ? '#ff4444' : '#44ff44';
+                
+                // Show/hide ban details
+                const banReasonItem = document.getElementById('ban-reason-item');
+                const bannedByItem = document.getElementById('banned-by-item');
+                const bannedAtItem = document.getElementById('banned-at-item');
+                const banBtn = document.getElementById('ban-user-btn');
+                const unbanBtn = document.getElementById('unban-user-btn');
+                
+                if (isBanned) {
+                    document.getElementById('admin-ban-reason').textContent = userDetails.basicInfo.banReason || 'No reason provided';
+                    document.getElementById('admin-banned-by').textContent = userDetails.basicInfo.bannedBy || 'Unknown';
+                    document.getElementById('admin-banned-at').textContent = userDetails.basicInfo.bannedAt ? 
+                        new Date(userDetails.basicInfo.bannedAt).toLocaleString() : 'Unknown';
+                    
+                    banReasonItem.style.display = 'flex';
+                    bannedByItem.style.display = 'flex';
+                    bannedAtItem.style.display = 'flex';
+                    banBtn.style.display = 'none';
+                    unbanBtn.style.display = 'inline-block';
+                } else {
+                    banReasonItem.style.display = 'none';
+                    bannedByItem.style.display = 'none';
+                    bannedAtItem.style.display = 'none';
+                    banBtn.style.display = 'inline-block';
+                    unbanBtn.style.display = 'none';
+                }
+                
+                // Don't show ban/unban buttons for admins
+                if (userDetails.basicInfo.rank === 'Admin') {
+                    banBtn.style.display = 'none';
+                    unbanBtn.style.display = 'none';
+                }
+                
+                // Add event listeners for ban/unban buttons
+                banBtn.onclick = () => banUser(userDetails.basicInfo.id);
+                unbanBtn.onclick = () => unbanUser(userDetails.basicInfo.id);
+                
+                // Hide loading and show details
+                loading.style.display = 'none';
+                details.style.display = 'block';
+                
+            } catch (err) {
+                console.error('Error loading admin details:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = `Error loading user details: ${err.message}`;
+            }
+        }
+        
+        function closeAdminPanel() {
+            document.getElementById('admin-panel-modal').style.display = 'none';
+        }
+        
+        async function banUser(userId) {
+            const reason = prompt('Enter ban reason:');
+            if (!reason || reason.trim() === '') {
+                alert('Ban reason is required');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/ban-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        userId: userId,
+                        reason: reason.trim()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('User banned successfully');
+                    // Refresh the admin panel
+                    openAdminPanel();
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Error banning user:', error);
+                alert('Error banning user. Please try again.');
+            }
+        }
+        
+        async function unbanUser(userId) {
+            if (!confirm('Are you sure you want to unban this user?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/unban-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        userId: userId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('User unbanned successfully');
+                    // Refresh the admin panel
+                    openAdminPanel();
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Error unbanning user:', error);
+                alert('Error unbanning user. Please try again.');
+            }
+        }
+        
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('admin-panel-modal');
+            if (event.target === modal) {
+                closeAdminPanel();
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                });
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        // Load profile on page load
+        loadProfile();
+    </script>
+
+    <!-- Admin Panel Modal -->
+    <div id="admin-panel-modal" class="admin-modal" style="display: none;">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h2>Admin Panel - User Details</h2>
+                <span class="admin-modal-close" onclick="closeAdminPanel()">&times;</span>
+            </div>
+            <div class="admin-modal-body">
+                <div id="admin-loading" class="admin-loading">Loading user details...</div>
+                <div id="admin-error" class="admin-error" style="display: none;"></div>
+                <div id="admin-details" class="admin-details" style="display: none;">
+                    <div class="admin-detail-section">
+                        <h3>Basic Information</h3>
+                        <div class="admin-detail-item">
+                            <label>User ID:</label>
+                            <span id="admin-user-id"></span>
+                        </div>
+                        <div class="admin-detail-item">
+                            <label>Username:</label>
+                            <span id="admin-username"></span>
+                        </div>
+                        <div class="admin-detail-item">
+                            <label>Email:</label>
+                            <span id="admin-email"></span>
+                        </div>
+                        <div class="admin-detail-item">
+                            <label>Rank:</label>
+                            <span id="admin-rank"></span>
+                        </div>
+                        <div class="admin-detail-item">
+                            <label>Created At:</label>
+                            <span id="admin-created-at"></span>
+                        </div>
+                    </div>
+                    <div class="admin-detail-section">
+                        <h3>Security Information</h3>
+                        <div class="admin-detail-item">
+                            <label>IP Address:</label>
+                            <span id="admin-ip-address"></span>
+                        </div>
+                        <div class="admin-detail-item">
+                            <label>Password Hash:</label>
+                            <span id="admin-password-hash" class="password-hash"></span>
+                        </div>
+                    </div>
+                    <div class="admin-detail-section">
+                        <h3>Profile Information</h3>
+                        <div class="admin-detail-item">
+                            <label>Bio:</label>
+                            <span id="admin-bio"></span>
+                        </div>
+                        <div class="admin-detail-item">
+                            <label>Profile Picture:</label>
+                            <span id="admin-profile-picture"></span>
+                        </div>
+                        <div class="admin-detail-item">
+                            <label>Banner:</label>
+                            <span id="admin-banner"></span>
+                        </div>
+                        <div class="admin-detail-item">
+                            <label>Profile Song:</label>
+                            <span id="admin-profile-song"></span>
+                        </div>
+                    </div>
+                    <div class="admin-detail-section">
+                        <h3>Ban Status</h3>
+                        <div class="admin-detail-item">
+                            <label>Banned:</label>
+                            <span id="admin-is-banned"></span>
+                        </div>
+                        <div class="admin-detail-item" id="ban-reason-item" style="display: none;">
+                            <label>Ban Reason:</label>
+                            <span id="admin-ban-reason"></span>
+                        </div>
+                        <div class="admin-detail-item" id="banned-by-item" style="display: none;">
+                            <label>Banned By:</label>
+                            <span id="admin-banned-by"></span>
+                        </div>
+                        <div class="admin-detail-item" id="banned-at-item" style="display: none;">
+                            <label>Banned At:</label>
+                            <span id="admin-banned-at"></span>
+                        </div>
+                        <div class="admin-actions">
+                            <button id="ban-user-btn" class="admin-btn ban-btn" style="display: none;">Ban User</button>
+                            <button id="unban-user-btn" class="admin-btn unban-btn" style="display: none;">Unban User</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

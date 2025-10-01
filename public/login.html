@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <title>Login - Chakerbakerben</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-paste">Add Paste</a></li>
+                <li><a href="/users">Users</a></li>
+
+                <li><a href="/hall-of-autism">Hall of Autism</a></li>
+                <li><a href="/support">Support</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="user-status">
+                    <a href="/login">Login</a> | <a href="/register">Register</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>Login</h2>
+
+            <div id="message" class="message" style="display: none;"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="form-submit">Login</button>
+            </form>
+
+            <div class="form-links">
+                <p>Don't have an account? <a href="/register">Register here</a></p>
+                <p><em>Jazirat Chakerbakrben tora7ibo bikoum!</em></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) {
+                return '';
+            }
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function validateAndSanitizeInput(input, maxLength = 100) {
+            if (!input || typeof input !== 'string') {
+                return '';
+            }
+            
+            let sanitized = input.trim();
+            if (sanitized.length > maxLength) {
+                sanitized = sanitized.substring(0, maxLength);
+            }
+            
+            return sanitized;
+        }
+
+        function displayMessage(messageDiv, type, message) {
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = escapeHtml(message);
+            messageDiv.style.display = 'block';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const messageDiv = document.getElementById('message');
+
+            const username = validateAndSanitizeInput(usernameInput.value, 50);
+            const password = validateAndSanitizeInput(passwordInput.value, 200);
+
+            if (!username || username.length < 3) {
+                displayMessage(messageDiv, 'error', 'Username must be at least 3 characters long.');
+                return;
+            }
+
+            if (!password || password.length < 6) {
+                displayMessage(messageDiv, 'error', 'Password must be at least 6 characters long.');
+                return;
+            }
+
+            usernameInput.value = username;
+            passwordInput.value = password;
+
+            try {
+                
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayMessage(messageDiv, 'success', 'Login successful! Redirecting...');
+
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    const errorMessage = data.error || 'Login failed';
+                    displayMessage(messageDiv, 'error', errorMessage);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                displayMessage(messageDiv, 'error', 'Network error. Please try again.');
+            }
+        });
+
+        document.getElementById('username').addEventListener('input', function(e) {
+            const sanitized = validateAndSanitizeInput(e.target.value, 50);
+            if (e.target.value !== sanitized) {
+                e.target.value = sanitized;
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function(e) {
+            const sanitized = validateAndSanitizeInput(e.target.value, 200);
+            if (e.target.value !== sanitized) {
+                e.target.value = sanitized;
+            }
+        });
+    </script>
+</body>
+</html>

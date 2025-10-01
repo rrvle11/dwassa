@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2025-09-29T22:26:29.476Z",
+    "userId": "68db077f99688c50a0400276",
+    "username": "testuserr",
+    "ipAddress": "::1",
+    "action": "LOGIN_FAILED"
+  },
+  {
+    "timestamp": "2025-09-29T22:26:33.509Z",
+    "userId": "68db077f99688c50a0400276",
+    "username": "testuserr",
+    "ipAddress": "::1",
+    "action": "LOGIN_BLOCKED"
+  }
+]

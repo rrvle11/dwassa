@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - Chakerbakerben</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-paste">Add Paste</a></li>
+                <li><a href="/users">Users</a></li>
+
+                <li><a href="/hall-of-autism">Hall of Autism</a></li>
+                <li><a href="/support">Support</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="user-status">
+                    <a href="/login">Login</a> | <a href="/register">Register</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section-header">Users</div>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Username...">
+            <button onclick="searchUsers()">Search</button>
+        </div>
+
+        <div id="loading" class="loading">Loading users...</div>
+        <div id="user-count" style="text-align: center; color: #888; margin: 20px 0;"></div>
+
+        <div id="users-container" style="display: none;">
+            <div class="rank-section">
+                <h3>Admin</h3>
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Pastes</th>
+                            <th>Comments</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-users">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="rank-section">
+                <h3>Manager</h3>
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Pastes</th>
+                            <th>Comments</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manager-users">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="rank-section">
+                <h3>Mod</h3>
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Pastes</th>
+                            <th>Comments</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="moderator-users">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="rank-section">
+                <h3>Members</h3>
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Pastes</th>
+                            <th>Comments</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="member-users">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="pagination" class="pagination"></div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentSearch = '';
+
+        // Add glitter effect to admin ranks
+        function addGlitterToAdminRanks() {
+            const adminElements = document.querySelectorAll('.rank-admin, .profile-rank.admin-rank');
+            
+            adminElements.forEach(element => {
+                // Remove existing glitter if any
+                const existingGlitter = element.querySelector('.glitter');
+                if (existingGlitter) {
+                    existingGlitter.remove();
+                }
+                
+                // Create glitter container
+                const glitter = document.createElement('div');
+                glitter.className = 'glitter';
+                
+                // Generate 50 random sparkles
+                for (let i = 0; i < 50; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = (Math.random() * 1) + 's';
+                    sparkle.style.animationDuration = (0.6 + Math.random() * 0.8) + 's';
+                    glitter.appendChild(sparkle);
+                }
+                
+                element.appendChild(glitter);
+            });
+        }
+
+        async function loadUsers(page = 1, search = '') {
+            try {
+                
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('users-container').style.display = 'none';
+
+                const response = await fetch(`/api/users?page=${page}&search=${encodeURIComponent(search)}`);
+                const data = await response.json();
+
+                displayUsers(data.users);
+                displayUserCount(data.totalUsers);
+                displayPagination(data.currentPage, data.totalPages);
+                updateUserStatus(data.user);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('users-container').style.display = 'block';
+                
+                // Add glitter to admin ranks after display
+                setTimeout(addGlitterToAdminRanks, 100);
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('loading').innerHTML = 'Error loading users';
+            }
+        }
+
+        function displayUsers(users) {
+            const ranks = ['admin', 'manager', 'moderator', 'member'];
+            ranks.forEach(rank => {
+                document.getElementById(`${rank}-users`).innerHTML = '';
+            });
+
+            const usersByRank = {
+                admin: [],
+                manager: [],
+                moderator: [],
+                member: []
+            };
+
+            users.forEach(user => {
+                const rank = user.rank.toLowerCase();
+                if (rank === 'admin') {
+                    usersByRank.admin.push(user);
+                } else if (rank === 'manager') {
+                    usersByRank.manager.push(user);
+                } else if (rank === 'moderator') {
+                    usersByRank.moderator.push(user);
+                } else {
+                    usersByRank.member.push(user);
+                }
+            });
+
+            ranks.forEach(rank => {
+                const tbody = document.getElementById(`${rank}-users`);
+                const rankUsers = usersByRank[rank];
+
+                rankUsers.forEach(user => {
+                    const row = document.createElement('tr');
+                    const formattedDate = new Date(user.joinDate).toLocaleDateString();
+                    const commentsCount = user.comments || 0; 
+                    
+                    let usernameHtml = '';
+                    if (user.isBanned) {
+                        usernameHtml = `<a href="/profile.html?userId=${user._id}"><span class="banned-user">${user.username}</span> <span class="banned-rank">[BANNED]</span></a>`;
+                    } else {
+                        usernameHtml = `<a href="/profile.html?userId=${user._id}" class="rank-${rank}">${user.username}</a>`;
+                    }
+
+                    row.innerHTML = `
+                        <td>${user._id}</td>
+                        <td>${usernameHtml}</td>
+                        <td>${user.pastesCreated}</td>
+                        <td>${commentsCount}</td>
+                        <td>${formattedDate}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                const section = tbody.closest('.rank-section');
+                section.style.display = rankUsers.length > 0 ? 'block' : 'none';
+            });
+        }
+
+        function displayUserCount(total) {
+            document.getElementById('user-count').textContent = `Showing ${total} users`;
+        }
+
+        function displayPagination(currentPage, totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            if (currentPage > 1) {
+                const prevLink = document.createElement('a');
+                prevLink.href = '#';
+                prevLink.textContent = '« Previous';
+                prevLink.onclick = (e) => {
+                    e.preventDefault();
+                    loadUsers(currentPage - 1, currentSearch);
+                };
+                pagination.appendChild(prevLink);
+            }
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    const current = document.createElement('span');
+                    current.textContent = i;
+                    current.className = 'current';
+                    pagination.appendChild(current);
+                } else {
+                    const pageLink = document.createElement('a');
+                    pageLink.href = '#';
+                    pageLink.textContent = i;
+                    pageLink.onclick = (e) => {
+                        e.preventDefault();
+                        loadUsers(i, currentSearch);
+                    };
+                    pagination.appendChild(pageLink);
+                }
+            }
+
+            if (currentPage < totalPages) {
+                const nextLink = document.createElement('a');
+                nextLink.href = '#';
+                nextLink.textContent = 'Next »';
+                nextLink.onclick = (e) => {
+                    e.preventDefault();
+                    loadUsers(currentPage + 1, currentSearch);
+                };
+                pagination.appendChild(nextLink);
+            }
+        }
+
+        function updateUserStatus(user) {
+            const userStatus = document.getElementById('user-status');
+            if (user) {
+                let usernameHtml = '';
+                if (user.isBanned) {
+                    usernameHtml = `<span class="username banned-user">${user.username}</span> <span class="banned-rank">[BANNED]</span>`;
+                } else {
+                    usernameHtml = `<span class="username rank-${user.rank.toLowerCase()}">${user.username}</span>`;
+                }
+                
+                userStatus.innerHTML = `
+                    Logged in as: ${usernameHtml} | 
+                    <a href="/profile.html?userId=${user.id}">Profile</a> |
+                    <a href="#" onclick="logout()">Logout</a>
+                `;
+                // Add glitter to navigation admin rank
+                setTimeout(addGlitterToAdminRanks, 50);
+            } else {
+                userStatus.innerHTML = '<a href="/login">Login</a> | <a href="/register">Register</a>';
+            }
+        }
+
+        function searchUsers() {
+            currentSearch = document.getElementById('search-input').value;
+            currentPage = 1;
+            loadUsers(1, currentSearch);
+        }
+
+        async function logout() {
+            try {
+                
+                await fetch('/api/logout', {
+                    method: 'POST',
+                });
+                location.reload();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchUsers();
+            }
+        });
+
+        loadUsers();
+    </script>
+</body>
+
+</html>

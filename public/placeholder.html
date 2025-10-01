@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - Chakerbakerben</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-paste">Add Paste</a></li>
+                <li><a href="/users">Users</a></li>
+
+                <li><a href="/hall-of-autism">Hall of Autism</a></li>
+                <li><a href="/support">Support</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="user-status">
+                    <a href="/login">Login</a> | <a href="/register">Register</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="text-align: center; margin: 100px 0;">
+            <h2>Coming Soon</h2>
+            <p style="margin: 20px 0; color: #888;">This feature is not yet implemented.</p>
+            <a href="/" style="color: #00ff00; text-decoration: none;">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        async function checkAuth() {
+            
+            try {
+                const response = await fetch('/api/pastes',);
+                const data = await response.json();
+                updateUserStatus(data.user);
+            } catch (error) {
+                console.error('Auth check error:', error);
+            }
+        }
+
+        function updateUserStatus(user) {
+            const userStatus = document.getElementById('user-status');
+            if (user) {
+                let usernameHtml = '';
+                if (user.isBanned) {
+                    usernameHtml = `<span class="username banned-user">${user.username}</span> <span class="banned-rank">[BANNED]</span>`;
+                } else {
+                    usernameHtml = `<span class="username rank-${user.rank.toLowerCase()}">${user.username}</span>`;
+                }
+                
+                userStatus.innerHTML = `
+                    Logged in as: ${usernameHtml} | 
+                    <a href="/profile.html?userId=${user.id}">Profile</a> |
+                    <a href="#" onclick="logout()">Logout</a>
+                `;
+            } else {
+                userStatus.innerHTML = '<a href="/login">Login</a> | <a href="/register">Register</a>';
+            }
+        }
+
+        async function logout() {
+            
+            try {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                });
+                location.reload();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        checkAuth();
+    </script>
+</body>
+
+</html>
